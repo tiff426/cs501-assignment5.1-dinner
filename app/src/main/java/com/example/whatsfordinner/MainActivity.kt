@@ -46,6 +46,28 @@ fun GreetingPreview() {
     }
 }
 
+
+// nav stuff?
+
+sealed class Routes(val route : String) {
+    object Home : Routes("home")
+    object Details : Routes("details")
+    object Recipe : Routes("recipe")
+}
+
+NavHost(navController = navController, startDestinatino = Routes.Home.route) {
+    composable(Routes.Home.route + "/{id}") { // what is the point of  + "/{id}" --> oh wait i think id is the variable to pass across screens?
+        Home()
+    }
+
+    composable(Routes.Details.route + "/{id}") {
+        Details()
+    }
+
+    composable(Routes.Recipe.route + "/{id}") {
+        Recipe()
+    }
+}
 //• Home screen: list of recipe names (use LazyColumn)
 //• Detail screen: displays full recipe (title, ingredients, steps) using data passed via arguments
 //• Add Recipe screen: form for entering new recipe (basic state management)
@@ -55,3 +77,60 @@ fun GreetingPreview() {
 //• Prevent multiple copies of the same screen using launchSingleTop
 //• Style and layout using Scaffold and consistent navigation
 //• Implement a BottomNavigation bar for “Home”, “Add”, and “Settings”; Persist recipes using in-memory state in ViewModel
+
+// screens
+@Composable
+fun MyApp() {
+    // create navController instance
+    val navController = rememberNavController()
+    // log changes if you want
+//    LaunchedEffect(navController) {
+//        navController.currentBackStack.collect { backStackEntries ->
+//            val routeList = backStackEntries.joinToString(separator = " -> ") { it.destination.route ?: "null" }
+//            Log.d(TAG, "Current Back Stack: $routeList")
+//        }
+//    }
+
+    // create navhost -> container for all of my routes
+    NavHost(
+        navController = navController,
+        startDestination = "home"
+    ) {
+        // where the actual composables are defined with their route
+        composable(route = "home") {
+            HomeScreen(navController = navController)
+        }
+
+        composable(route = "details") {
+            DetailsScreen(navController = navController)
+        }
+
+        composable(route = "recipe") {
+            RecipeScreen(navController = navController)
+        }
+    }
+}
+
+// actually create the screens now
+@Composable
+fun HomeScreen(navController : NavController) {
+    val placeholders = listOf(
+        "hello",
+        "hello again",
+        "goodbye"
+    )
+    Column(
+        modifier = Modifier.padding(top = 24.dp)
+    ) {
+        Text(text = "Home")
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(messages) { message ->
+                Text(message)
+            }
+        }
+    }
+}
